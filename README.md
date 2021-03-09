@@ -3,6 +3,7 @@ Python scripts that convert Tindie and Digi-Key Marketplace csv files to Shippo 
 
 Incoming csv files from Tindie or DK Marketplace should be called "orders.csv"
 Outgoing csv file to Shippo is called "shippoOrders.csv"
+CSV files are IGNORED in the git repo, so that I don't accidentally upload order info.
 
 You will need to create a csv file called ProductShippingInfo to map Model Number / SKUs to weights.
   - there is a xlsx file with an example for this file

@@ -55,7 +55,9 @@ while (i < len(weightCount)) :
     if i+1 < len(weightCount):
         while (weightCount[i][0] == weightCount[i+1][0]):
             orderWeight += (weightCount[i+1][1] * weightCount[i+1][2])
-            i += 1
+            if i+2 == len(weightCount):
+                break
+            else: i += 1
     orderWeight += 0.063
     weightCount[begIndex][3] = orderWeight
     i += 1

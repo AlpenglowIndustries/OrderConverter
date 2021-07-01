@@ -68,10 +68,10 @@ for row in orders:
     # writes out all final values to shippoOrders.csv
     # concatenates first and last names into single recipient name
     # concatenates Product Name and Option into a single Item Title
-    shippoOrders.writerow({'Order Number': row['Order ID'], 'Order Date': row['Date'], 'Email': row['Email'],
-        'Company': row['Company Title'],'Phone': row['Phone'], 'Street Line 1': row['Street'], 'City': row['City'],
-        'State/Province': row['State / Province'],'Zip/Postal Code': row['Postal/Zip Code'], 'Country': row['Country'],
-        'Recipient Name': row['First Name'] + " " + row['Last Name'], 'Item Title': row['Product Name'] + " " + row['Option Summary'],
+    shippoOrders.writerow({'Order Number': row['Order ID'], 'Order Date': row['Order Date'], 'Email': row['Email'],
+        'Company': row['Company'],'Phone': row['Phone'], 'Street Line 1': row['Street'], 'City': row['City'],
+        'State/Province': row['State/Province'],'Zip/Postal Code': row['Postal/Zip Code'], 'Country': row['Country'],
+        'Recipient Name': row['First Name'] + " " + row['Last Name'], 'Item Title': row['Product Title'] + " " + row['Option Summary'],
         'SKU': row['Model Number'], 'Quantity': row['Quantity'], 'Item Price': row['Unit Price'], 'Item Weight': weightCount[rowNum][2],
         'Item Weight Unit': 'lb', 'Order Currency': 'USD', 'Order Weight': weightCount[rowNum][3], 'Order Weight Unit': 'lb',
         'Order Amount': row['Order Total']})

@@ -61,7 +61,7 @@ inputFile.seek(0)
 orders = csv.DictReader(inputFile)
 for row in orders:
 
-    # makes our great country readable to Shippo
+    # makes our great country readable to Shippo, Tindie orders
     if "United States of America" in row['Country']:
         row['Country'] = "USA"
 

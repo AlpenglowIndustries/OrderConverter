@@ -20,6 +20,7 @@ def getDesc(itemNum):
     for row in shipInfo:
         if (row['Item'] == itemNum):
             return row['Description']
+#    return 0.063  # if nothing matches condition - needs testing
 
 # opens orders file downloaded from Tindie and reads into an array,
 #   with header names as the first row

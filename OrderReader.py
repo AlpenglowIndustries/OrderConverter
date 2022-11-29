@@ -33,6 +33,7 @@
 # - repeats for next file
 
 import csv, os, shutil
+from decimal import Decimal
 
 def getWeight(itemNum):
     infoFile = open('ProductShippingInfo.csv', 'r')
@@ -105,7 +106,7 @@ for file in orderFiles:
         hQty = 'Product Quantity'
         hIP = 'Product Price'
         hOA = 'Total'
-    elif fields[0] == 'Order ID':
+    elif fields[19] == 'Tindie Fee':
         orderPlatform = 'Tindie'
         hON = 'Order ID'
         hOD = 'Order Date'
@@ -126,27 +127,30 @@ for file in orderFiles:
         hQty = 'Quantity'
         hIP = 'Unit Price'
         hOA = 'Order Total'
-    else:
+    elif fields[6] == 'DIGI-KEY PN':
         orderPlatform = 'DigiKey'
         hON = 'ORDER ID'
         hOD = 'CREATED'
         hFN = 'SHIPPING ADDRESS FIRST NAME'
         hLN = 'SHIPPING ADDRESS LAST NAME'
-     #   hEm = 'Email'
+        hEm = 'Email'
         hPh = 'SHIPPING ADDRESS PHONE'
         hCo = 'SHIPPING ADDRESS COMPANY'
         hSL1 = 'SHIPPING ADDRESS STREET 1'
-        hSL2 = 'SHIPPING ADDRESS STREET 2'
+        hSL2 = ' SHIPPING ADDRSS STREET 2'
         hCi = 'SHIPPING ADDRESS CITY'
         hSt = 'SHIPPING ADDRESS STATE'
         hZp = 'SHIPPING ADDRESS ZIP'
         hCn = 'SHIPPING ADDRESS COUNTRY'
-     #   hIT = 'Item Name'
-     #   hIO = 'Item Option'
-     #   hSKU = 'Offer SKU'
+        hIT = 'Item Name'
+        hIO = 'Item Option'
+        hSKU = 'MANUFACTURER PN'
         hQty = 'QTY'
         hIP = 'UNIT PRICE'
-     #   hOA = 'Total order amount incl. VAT (including shipping charges)'
+        hOA = 'Order Amount'
+        hSA = 'SHIPING TOTAL AMOUNT'
+    else:
+        print('ERROR, Order Platform Not Identified')
 
     print(file + ' is from ' + orderPlatform)
 
@@ -222,7 +226,11 @@ for file in orderFiles:
                     ordersRaw[i].append(hEm)
                     ordersRaw[i].append(hIT)
                     ordersRaw[i].append(hIO)
+                    ordersRaw[i].append(hOA)
+                    ordersRaw[i].append('')
                 else:
+                    ordersRaw[i].append('')
+                    ordersRaw[i].append('')
                     ordersRaw[i].append('')
                     ordersRaw[i].append('')
                     ordersRaw[i].append('')
@@ -242,23 +250,29 @@ for file in orderFiles:
         if itemWeight is None:
             itemWeight = 0.063
         itemDesc = getDesc(row[hSKU])  # mainly for DigiKey orders that don't have an Item Title, gets it from ProductShippingInfo.csv
-        weightCount.append([row[hON], int(row[hQty]), float(itemWeight), " ", itemDesc])
+        itemPrice = row[hIP]
+        weightCount.append([row[hON], int(row[hQty]), float(itemWeight), " ", itemDesc, float(Decimal(itemPrice.strip('$'))), " "])
+
 
     # goes through weight data and calculates overall order weight
     # adds 1 oz to all orders to account for bubble packaging
     i = 0
     orderWeight = 0
+    orderTotalAmt = 0  # Digi-Key no longer gives us total order amount, must calculate
     while (i < len(weightCount)) :
         begIndex = i
-        orderWeight = weightCount[i][1] * weightCount[i][2]   # order weight is the total weight of first line of items
-        if i+1 < len(weightCount):
-            while (weightCount[i][0] == weightCount[i+1][0]):
+        orderWeight = weightCount[i][1] * weightCount[i][2]    # qty * individual weight
+        orderTotalAmt = weightCount[i][1] * weightCount[i][5]  # qty * individual price
+        if i+1 < len(weightCount):                             # looks ahead and figures out if the order continues on multiple lines
+            while (weightCount[i][0] == weightCount[i+1][0]):  # makes sure order number is the same
                 orderWeight += (weightCount[i+1][1] * weightCount[i+1][2])
+                orderTotalAmt += (weightCount[i+1][1] * weightCount[i+1][5])
                 if i+2 == len(weightCount):
                     break
                 else: i += 1
         orderWeight += 0.063
         weightCount[begIndex][3] = orderWeight
+        weightCount[begIndex][6] = orderTotalAmt
         i += 1
 
     # resets file to re-read
@@ -277,9 +291,10 @@ for file in orderFiles:
         if "United States of America" in row[hCn]:
             row[hCn] = "USA"
 
-        # DigiKey orders - adds the item title grabbed from ProductShippingInfo.csv
-        if row[hIT] == '':
+        # DigiKey orders - adds the item title grabbed from ProductShippingInfo.csv & total order weight
+        if orderPlatform == 'DigiKey':
             row[hIT] = weightCount[rowNum][4]
+            row[hOA] = weightCount[rowNum][6] + float(Decimal(row[hSA].strip('$')))
 
         # writes out all final values to shippoOrders.csv
         # concatenates first and last names into single recipient name
@@ -292,7 +307,6 @@ for file in orderFiles:
             'Item Weight Unit': 'lb', 'Order Currency': 'USD', 'Order Weight': weightCount[rowNum][3], 'Order Weight Unit': 'lb',
             'Order Amount': row[hOA]})
         rowNum+=1
-
     inputFile.close()
     shutil.move(file, '.\\processed')
     outputFile.close()

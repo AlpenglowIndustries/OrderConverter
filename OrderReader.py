@@ -127,7 +127,7 @@ for file in orderFiles:
         hQty = 'Quantity'
         hIP = 'Unit Price'
         hOA = 'Order Total'
-    elif fields[6] == 'DIGI-KEY PN':
+    elif fields[7] == 'DIGI-KEY PN':
         orderPlatform = 'DigiKey'
         hON = 'ORDER ID'
         hOD = 'CREATED'
@@ -148,7 +148,7 @@ for file in orderFiles:
         hQty = 'QTY'
         hIP = 'UNIT PRICE'
         hOA = 'Order Amount'
-        hSA = 'SHIPING TOTAL AMOUNT'
+        hSA = 'SHIPPING TOTAL AMOUNT'
     else:
         print('ERROR, Order Platform Not Identified')
 
